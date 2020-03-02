@@ -4,6 +4,7 @@ using System.Linq;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using WebStore.DAL.Context;
+using WebStore.Domain.DTO.Orders;
 using WebStore.Domain.Entities;
 using WebStore.Domain.Entities.Identity;
 using WebStore.Domain.ViewModels;
@@ -22,17 +23,29 @@ namespace WebStore.Services.Product
             _UserManager = UserManager;
         }
 
-        public IEnumerable<Order> GetUserOrders(string UserName) => _db.Orders
+        public IEnumerable<OrderDTO> GetUserOrders(string UserName) => _db.Orders
            .Include(order => order.User)
            .Include(order => order.OrderItems)
            .Where(order => order.User.UserName == UserName)
-           .ToArray();
+           .ToArray()
+           .Select(o => new OrderDTO
+           {
+               Phone = o.Phone,
+               Address = o.Address,
+               Date = o.Date,
+               OrderItems = o.OrderItems.Select(item => new OrderItemDTO()
+               {
+                   Id = item.Id,
+                   Price = item.Price,
+                   Quantity = item.Quantity
+               })
+           });
 
-        public Order GetOrderById(int id) => _db.Orders
+        public OrderDTO GetOrderById(int id) => _db.Orders
            .Include(order => order.OrderItems)
            .FirstOrDefault(order => order.Id == id);
 
-        public Order CreateOrder(OrderViewModel OrderModel, CartViewModel CartModel, string UserName)
+        public Order CreateOrder(CreateOrderModel OrderModel, string UserName)
         {
             var user = _UserManager.FindByNameAsync(UserName).Result;
 
