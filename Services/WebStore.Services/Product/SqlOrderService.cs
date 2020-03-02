@@ -41,10 +41,24 @@ namespace WebStore.Services.Product
                })
            });
 
-        public OrderDTO GetOrderById(int id) => _db.Orders
-           .Include(order => order.OrderItems)
-           .FirstOrDefault(order => order.Id == id);
-
+        public OrderDTO GetOrderById(int id)
+        {
+            var o = _db.Orders
+                .Include(order => order.OrderItems)
+                .FirstOrDefault(order => order.Id == id);
+            return o is null ? null : new OrderDTO
+            {
+                Phone = o.Phone,
+                Address = o.Address,
+                Date = o.Date,
+                OrderItems = o.OrderItems.Select(item => new OrderItemDTO()
+                {
+                    Id = item.Id,
+                    Price = item.Price,
+                    Quantity = item.Quantity
+                })
+            };
+        }
         public Order CreateOrder(CreateOrderModel OrderModel, string UserName)
         {
             var user = _UserManager.FindByNameAsync(UserName).Result;
@@ -53,9 +67,9 @@ namespace WebStore.Services.Product
             {
                 var order = new Order
                 {
-                    Name = OrderModel.Name,
-                    Address = OrderModel.Address,
-                    Phone = OrderModel.Phone,
+                    Name = OrderModel.OrderViewModel.Name,
+                    Address = OrderModel.OrderViewModel.Address,
+                    Phone = OrderModel.OrderViewModel.Phone,
                     User = user,
                     Date = DateTime.Now
                 };
