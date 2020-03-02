@@ -35,24 +35,13 @@ namespace WebStore.ServiceHosting.Controllers
         }
 
         [HttpPut("{id}"), ActionName("Put")]
-        public EmployeeView Edit(int id, EmployeeView Employee)
-        {
-            _EmployeesData.Edit(id, Employee);
-        }
-
+        public EmployeeView Edit(int id, [FromBody] EmployeeView Employee) => _EmployeesData.Edit(id, Employee);
 
         [HttpDelete("{id}")]
-        public bool Delete(int id)
-        {
-            return _EmployeesData.Delete(id);
-        }
-
-        
+        public bool Delete(int id) => _EmployeesData.Delete(id);
+      
 
         [NonAction]
-        public void SaveChanges()
-        {
-            _EmployeesData.SaveChanges();
-        }
+        public void SaveChanges() => _EmployeesData.SaveChanges();
     }
 }
