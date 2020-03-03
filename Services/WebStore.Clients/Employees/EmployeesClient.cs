@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Text;
 using WebStore.Clients.Base;
 using WebStore.Domain.ViewModels;
@@ -12,34 +13,20 @@ namespace WebStore.Clients.Employees
     {
         public EmployeesClient(IConfiguration config) : base (config, "api/employees") { }
 
-        public void Add(EmployeeView Employee)
+        public IEnumerable<EmployeeView> GetAll() => Get<List<EmployeeView>>(_ServiceAddress);
+
+        public EmployeeView GetById(int id) => Get<EmployeeView>($"{_ServiceAddress}/{id}");
+
+        public void Add(EmployeeView Employee) => Post(_ServiceAddress, Employee);
+
+        public EmployeeView Edit(int id, EmployeeView Employee)
         {
-            throw new NotImplementedException();
+            var response = Put($"{_ServiceAddress}/{id}", Employee);
+            return response.Content.ReadAsAsync<EmployeeView>().Result;
         }
 
-        public bool Delete(int id)
-        {
-            throw new NotImplementedException();
-        }
+        public bool Delete(int id) => Delete($"{_ServiceAddress}/{id}").IsSuccessStatusCode;
 
-        public void Edit(int id, EmployeeView Employee)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IEnumerable<EmployeeView> GetAll()
-        {
-            throw new NotImplementedException();
-        }
-
-        public EmployeeView GetById(int id)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void SaveChanges()
-        {
-            throw new NotImplementedException();
-        }
+        public void SaveChanges(){}
     }
 }
