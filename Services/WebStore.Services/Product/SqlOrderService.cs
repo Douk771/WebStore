@@ -59,7 +59,7 @@ namespace WebStore.Services.Product
                 })
             };
         }
-        public Order CreateOrder(CreateOrderModel OrderModel, string UserName)
+        public OrderDTO CreateOrder(CreateOrderModel OrderModel, string UserName)
         {
             var user = _UserManager.FindByNameAsync(UserName).Result;
 
@@ -76,17 +76,17 @@ namespace WebStore.Services.Product
 
                 _db.Orders.Add(order);
 
-                foreach (var (product_model, quantity) in CartModel.Items)
+                foreach (var item in OrderModel.OrderItems)
                 {
-                    var product = _db.Products.FirstOrDefault(p => p.Id == product_model.Id);
+                    var product = _db.Products.FirstOrDefault(p => p.Id == item.Id);
                     if(product is null)
-                        throw new InvalidOperationException($"Товар с идентификатором id:{product_model.Id} отсутствует в БД");
+                        throw new InvalidOperationException($"Товар с идентификатором id:{item.Id} отсутствует в БД");
 
                     var order_item = new OrderItem
                     {
                         Order = order,
                         Price = product.Price,
-                        Quantity = quantity,
+                        Quantity = item.Quantity,
                         Product = product
                     };
 
@@ -95,7 +95,19 @@ namespace WebStore.Services.Product
 
                 _db.SaveChanges();
                 transaction.Commit();
-                return order;
+
+                return new OrderDTO
+                {
+                    Phone = order.Phone,
+                    Address = order.Address,
+                    Date = order.Date,
+                    OrderItems = order.OrderItems.Select(item => new OrderItemDTO()
+                    {
+                        Id = item.Id,
+                        Price = item.Price,
+                        Quantity = item.Quantity
+                    })
+                };
             }
         }
     }
