@@ -30,6 +30,7 @@ namespace WebStore.Services.Product
            .ToArray()
            .Select(o => new OrderDTO
            {
+               Id = o.Id,
                Phone = o.Phone,
                Address = o.Address,
                Date = o.Date,
@@ -48,6 +49,7 @@ namespace WebStore.Services.Product
                 .FirstOrDefault(order => order.Id == id);
             return o is null ? null : new OrderDTO
             {
+                Id = o.Id,
                 Phone = o.Phone,
                 Address = o.Address,
                 Date = o.Date,
@@ -98,6 +100,7 @@ namespace WebStore.Services.Product
 
                 return new OrderDTO
                 {
+                    Id = order.Id,
                     Phone = order.Phone,
                     Address = order.Address,
                     Date = order.Date,
