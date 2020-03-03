@@ -23,5 +23,6 @@ namespace WebStore.Clients.Orders
             .Content
             .ReadAsAsync<OrderDTO>()
             .Result;
+
     }
 }
